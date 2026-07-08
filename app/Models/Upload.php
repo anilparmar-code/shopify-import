@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Upload\UploadStatusEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Upload extends Model
 {
@@ -31,5 +32,10 @@ class Upload extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function importRecords(): HasMany
+    {
+        return $this->hasMany(ImportRecord::class);
     }
 }

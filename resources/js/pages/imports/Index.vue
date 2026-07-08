@@ -103,8 +103,13 @@ defineOptions({
                         </tr>
                         <tr v-for="upload in uploads.data" :key="upload.id" class="hover:bg-muted/30 transition-colors">
                             <td class="p-4 font-medium">#{{ upload.id }}</td>
-                            <td class="p-4 max-w-[240px] truncate" :title="upload.file_name">
-                                {{ upload.file_name }}
+                            <td class="p-4 max-w-[240px] truncate underline" :title="upload.file_name">
+                                <Link
+                                    :href="UploadController.importRecords.url({ upload: upload.id })"
+                                    class="text-primary hover:underline font-medium"
+                                >
+                                    {{ upload.file_name }}
+                                </Link>
                             </td>
                             <td class="p-4">
                                 <Badge

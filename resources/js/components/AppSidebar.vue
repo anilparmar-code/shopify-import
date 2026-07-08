@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, Upload } from '@lucide/vue';
+import { BookOpen, FolderGit2, LayoutGrid, Upload, Package } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -15,7 +15,9 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { index } from '@/routes/uploads';
+import { index as errorLogsIndex } from '@/routes/error-logs';
+import { index as productsIndex } from '@/routes/products';
+import { index, importRecords } from '@/routes/uploads';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -29,6 +31,16 @@ const mainNavItems: NavItem[] = [
         href: index(),
         icon: Upload,
     },
+    {
+        title: 'Products',
+        href: productsIndex(),
+        icon: Package,
+    },
+    {
+        title: 'Logs',
+        href: errorLogsIndex(),
+        icon: FolderGit2,
+    }
 ];
 
 const footerNavItems: NavItem[] = [

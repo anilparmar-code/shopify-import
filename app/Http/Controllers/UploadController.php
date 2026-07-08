@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\Upload\UploadStatusEnum;
 use App\Http\Requests\StoreImportUploadRequest;
 use App\Jobs\ProcessCsvUpload;
+use App\Models\Upload;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -56,7 +57,7 @@ class UploadController extends Controller
         $csvFile = $request->file('csv_file');
 
         $upload = $request->user()->uploads()->create([
-            'file_path' => $csvFile->store('imports/'),
+            'file_path' => $csvFile->store('imports'),
             'original_file_name' => $csvFile->getClientOriginalName(),
             'status' => UploadStatusEnum::PENDING->value,
         ]);
@@ -71,5 +72,43 @@ class UploadController extends Controller
         ]);
 
         return to_route('uploads.index');
+    }
+
+    /**
+     * View all import records of an upload with error logs in table format.
+     */
+    public function importRecords(Request $request, Upload $upload): Response
+    {
+        $userUpload = $request->user()->uploads()->findOrFail($upload->id);
+
+        $importRecords = $userUpload->importRecords()
+            ->latest()
+            ->paginate(15)
+            ->withQueryString()
+            ->through(fn ($record) => [
+                'id' => $record->id,
+                'data' => $record->data,
+                'status' => $record->status,
+                'created_at' => $record->created_at->format('Y-m-d H:i:s'),
+                'error_logs' => $record->errorLogs()
+                    ->latest()
+                    ->get()
+                    ->map(fn ($log) => [
+                        'id' => $log->id,
+                        'level' => $log->level,
+                        'event' => $log->event,
+                        'message' => $log->message,
+                        'context' => $log->context,
+                    ]),
+            ]);
+
+        return Inertia::render('imports/ImportRecords', [
+            'upload' => [
+                'id' => $userUpload->id,
+                'file_name' => $userUpload->original_file_name,
+                'status' => $userUpload->status->value,
+            ],
+            'importRecords' => $importRecords,
+        ]);
     }
 }
